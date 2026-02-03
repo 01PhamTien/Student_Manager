@@ -1,0 +1,44 @@
+# Render service configuration
+# - Replace placeholders (YOUR-...) with real values after creating service or DB
+# - For secrets (db password), set them in Render Dashboard or use Render's secrets mechanism
+
+services:
+  - type: web
+    name: student-manager
+    env: docker
+    plan: free
+    branch: main
+    dockerfilePath: ./Dockerfile
+    buildCommand: mvn -DskipTests package
+    startCommand: java -Dserver.port=$PORT -jar target/*.jar
+    envVars:
+      # Do NOT include sensitive values here. Add them as secrets in Render dashboard.
+      - key: SPRING_DATASOURCE_URL
+        value: "${SPRING_DATASOURCE_URL}"
+      - key: SPRING_DATASOURCE_USERNAME
+        value: "${SPRING_DATASOURCE_USERNAME}"
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: "${SPRING_DATASOURCE_PASSWORD}"
+
+databases:
+  - name: student-manager-db
+    engine: postgres
+    plan: starter
+    version: "14"
+
+# Optional: You can add cron jobs here to run backups or maintenance tasks
+# jobs:
+#   - name: daily-db-backup
+#     type: scheduled
+#     schedule: "0 3 * * *" # daily at 03:00 UTC
+#     command: "pg_dump --dbname=$SPRING_DATASOURCE_URL -f /tmp/backup.dump && gzip /tmp/backup.dump && aws s3 cp /tmp/backup.dump.gz s3://your-bucket/backups/"
+#     envVars:
+#       - key: AWS_ACCESS_KEY_ID
+#         value: "${AWS_ACCESS_KEY_ID}"
+#       - key: AWS_SECRET_ACCESS_KEY
+#         value: "${AWS_SECRET_ACCESS_KEY}"
+
+# Notes:
+# - After pushing this file, go to Render dashboard -> New -> From Render YAML -> connect repo and follow prompts.
+# - In Render, set the actual DB credentials and AWS credentials as Environment / Secrets.
+# - If you prefer Render-managed Postgres, create it via Dashboard and then set SPRING_DATASOURCE_URL to the provided connection string.
