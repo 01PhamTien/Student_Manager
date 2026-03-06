@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/students")
@@ -43,18 +44,17 @@ public class StudentController {
     }
 
     // XỬ LÝ THÊM SINH VIÊN (POST)
+    // ID sẽ được tự động tạo bởi hệ thống, không cần kiểm tra trùng
     @PostMapping("/add")
     public String addStudent(@ModelAttribute Student student) {
-        if (studentService.getStudentById(student.getId()).isPresent()) {
-            return "redirect:/students/add?error=exists";
-        }
+        // Không cần kiểm tra ID trùng vì UUID tự động tạo
         studentService.saveStudent(student);
         return "redirect:/students";
     }
 
     // 4. HIỂN THỊ FORM CẬP NHẬT (Lấy dữ liệu cũ đổ vào Form)
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable int id, @RequestParam(required = false) String error, Model model) {
+    public String showEditForm(@PathVariable UUID id, @RequestParam(required = false) String error, Model model) {
         Student student = studentService.getStudentById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID không hợp lệ: " + id));
 
@@ -67,16 +67,14 @@ public class StudentController {
     // XỬ LÝ CẬP NHẬT SINH VIÊN (POST)
     @PostMapping("/update")
     public String updateStudent(@ModelAttribute Student student) {
-        if (studentService.getStudentById(student.getId()).isEmpty()) {
-            return "redirect:/students/edit/" + student.getId() + "?error=notfound";
-        }
+        // JpaRepository.save() sẽ tự động update nếu ID tồn tại
         studentService.saveStudent(student);
         return "redirect:/students";
     }
 
     // 5. XÓA: Xử lý xóa theo ID (POST)
     @PostMapping("/delete/{id}")
-    public String deleteStudentPost(@PathVariable int id) {
+    public String deleteStudentPost(@PathVariable UUID id) {
         studentService.deleteStudent(id);
         return "redirect:/students";
     }

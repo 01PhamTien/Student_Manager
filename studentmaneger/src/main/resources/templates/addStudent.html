@@ -13,7 +13,7 @@
         }
         .card {
             border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
         }
         .card-header {
             padding: 20px;
@@ -49,16 +49,9 @@
 
             <div th:if="${isNew}">
                 <form th:action="@{/students/add}" th:object="${student}" method="post">
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error == 'exists' ? 'ID đã tồn tại. Vui lòng chọn ID khác.' : error}"></div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Mã số sinh viên (ID):</label>
-                        <input type="number"
-                               th:field="*{id}"
-                               class="form-control"
-                               placeholder="Nhập ID"
-                               required>
-                    </div>
+                    <!-- ID được tự động tạo, không hiển thị trong form thêm mới -->
+                    
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
                     <div class="mb-3">
                         <label class="form-label">Họ và tên:</label>
@@ -89,14 +82,13 @@
 
             <div th:if="${!isNew}">
                 <form th:action="@{/students/update}" th:object="${student}" method="post">
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error == 'notfound' ? 'Sinh viên không tồn tại (ID).' : error}"></div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error == 'notfound' ? 'Sinh viên không tồn tại.' : error}"></div>
 
                     <div class="mb-3">
                         <label class="form-label">Mã số sinh viên (ID):</label>
-                        <input type="number"
+                        <input type="text"
                                th:field="*{id}"
                                class="form-control"
-                               placeholder="Nhập ID"
                                readonly>
                     </div>
 
@@ -132,3 +124,4 @@
 
 </body>
 </html>
+

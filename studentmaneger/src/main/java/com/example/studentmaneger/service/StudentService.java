@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class StudentService {
@@ -19,7 +20,7 @@ public class StudentService {
     }
 
     // 2. Lấy sinh viên theo ID (Dùng cho chức năng Sửa/Xem chi tiết)
-    public Optional<Student> getStudentById(int id) {
+    public Optional<Student> getStudentById(UUID id) {
         return repository.findById(id);
     }
 
@@ -31,7 +32,7 @@ public class StudentService {
     }
 
     // 4. Xóa sinh viên theo ID
-    public void deleteStudent(int id) {
+    public void deleteStudent(UUID id) {
         repository.deleteById(id);
     }
 
@@ -41,24 +42,17 @@ public class StudentService {
     }
 
     // Tìm kiếm sinh viên theo danh sách ID
-    public List<Student> findByIds(List<Integer> ids) {
+    public List<Student> findByIds(List<UUID> ids) {
         return repository.findByIdIn(ids);
     }
 
-    // Tìm và lọc theo nhiều tiêu chí: q có thể là tên hoặc id; minAge/maxAge để lọc
-    // tuổi
+    // Tìm và lọc theo nhiều tiêu chí: q có thể là tên; minAge/maxAge để lọc tuổi
     public List<Student> searchStudents(String q, Integer minAge, Integer maxAge, String sort) {
         List<Student> results;
+
+        // Chỉ tìm kiếm theo tên (bỏ tìm theo ID vì UUID không còn phù hợp)
         if (q != null && !q.isBlank()) {
-            try {
-                int id = Integer.parseInt(q.trim());
-                return repository.findById(id)
-                        .map(List::of)
-                        .orElse(List.of());
-            } catch (NumberFormatException ex) {
-                // not an id, search by name contains
-                results = repository.findByNameContainingIgnoreCase(q.trim());
-            }
+            results = repository.findByNameContainingIgnoreCase(q.trim());
         } else {
             results = repository.findAll();
         }
